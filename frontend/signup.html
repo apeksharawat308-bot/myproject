@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Signup</title>
+<style>
+body {
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(135deg,#ff9a9e,#fad0c4);
+    font-family:Arial;
+}
+
+.card {
+    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.2);
+    padding:30px;
+    border-radius:20px;
+    text-align:center;
+    width:300px;
+}
+
+input {
+    width:90%;
+    padding:10px;
+    margin:8px;
+    border:none;
+    border-radius:10px;
+}
+
+button {
+    width:95%;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    background:#6c5ce7;
+    color:white;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Create Account</h2>
+    <input id="username" placeholder="Username">
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="signup()">Sign Up</button>
+</div>
+
+<script>
+async function signup(){
+    await fetch("http://localhost:8080/register",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            username:username.value,
+            email:email.value,
+            password:password.value
+        })
+    });
+    alert("Account Created");
+    location='login.html';
+}
+</script>
+
+</body>
+</html>
