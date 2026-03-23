@@ -57,7 +57,7 @@ This system improves **road safety awareness, repair efficiency, and citizen eng
 
 - **Backend:** Java (Spring Boot or Java SE)  
 - **Frontend:** HTML/CSS/JavaScript or JavaFX  
-- **Database:** SQLite / MySQL  
+- **Database:** SQLite 
 - **AI/ML (optional):** Python for image analysis  
 - **Maps & Visualization:** Google Maps API / Leaflet.js
 
