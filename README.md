@@ -1,146 +1,64 @@
-# Road Issue Reporting and Tracking (Java Project)
+# Road Issue Reporting and Tracking System (Java Project)
 
-A **complete road issue management system** that allows citizens to report road problems, uses AI for damage detection, visualizes issues on a map, and provides analytics for authorities to take action.
-
----
-
-## ✅ Complete Modules with Features
+This Java-based project is a **comprehensive smart traffic and road management system** designed to empower citizens and authorities to monitor and improve road conditions. The system combines **user reporting, AI-powered damage detection, real-time mapping, alerts, analytics, and smart route suggestions** to enhance road safety and repair efficiency.
 
 ---
 
-### **Module 1: User & Complaint Reporting Module**
-Allows citizens to report road problems.
+## Key Features
 
-**Features:**
-- User registration & login
-- Upload road issue image
-- Add description
-- Auto location capture
-- Complaint history
-- Track complaint status
+### 1. User & Complaint Reporting
+- Citizens can register, log in, and report road issues with images and location.
+- Complaint tracking and history management.
 
-**Purpose:**  
-Allows people to report potholes or road damage easily.
+### 2. AI Road Damage Detection
+- Automatically analyzes uploaded images.
+- Categorizes damage type, estimates severity, and predicts priority.
 
----
+### 3. Map & Location Intelligence
+- Visualizes road issues on maps with markers, heatmaps, and danger zones.
+- Detects nearby issues to inform users in real time.
 
-### **Module 2: AI Road Damage Detection Module**
-Analyzes uploaded images.
+### 4. Alert & Notification System
+- Sends notifications about nearby road hazards or complaint updates.
+- Supports email and app notifications for emergency situations.
 
-**Features:**
-- Detect potholes from image
-- Categorize damage type
-- Estimate damage severity
-- Predict priority level
+### 5. Analytics & Smart Dashboard
+- Provides insights into complaint distribution, most damaged roads, repair statistics, and safety scores.
+- Enables authorities to make data-driven decisions.
 
-**Purpose:**  
-Automatically identifies serious road damage.
+### 6. Community Verification
+- Users can verify reported issues, vote on complaints, and reduce fake reports.
 
----
+### 7. Smart Route Suggestions
+- Suggests safer alternate routes avoiding damaged roads.
+- Incorporates safety score-based routing.
 
-### **Module 3: Map & Location Intelligence Module**
-Shows road issues visually on a map.
-
-**Features:**
-- Complaint markers on map
-- Danger zones highlighted
-- Heatmap of damaged roads
-- Nearby issue detection
-
-**Purpose:**  
-Helps users and authorities see unsafe roads.
+### 8. Before & After Repair Tracking
+- Compares repair images to track improvement and success of repairs.
 
 ---
 
-### **Module 4: Alert & Notification Module**
-Warns users about road dangers.
+## Purpose
 
-**Features:**
-- Alert for nearby road damage
-- Complaint status updates
-- Emergency issue alert
-- Email/app notifications
-
-**Purpose:**  
-Improves road safety awareness.
+This system improves **road safety awareness, repair efficiency, and citizen engagement**, leveraging technology to identify and prioritize road problems effectively.
 
 ---
 
-### **Module 5: Analytics & Smart Dashboard Module**
-Analyzes road conditions.
+## Usage
 
-**Features:**
-- Number of complaints by area
-- Most damaged roads
-- Repair statistics
-- Monthly reports
-- Road safety score
-
-**Purpose:**  
-Shows patterns of road problems.
+1. Open the project in **VS Code** or your preferred Java IDE.
+2. Run the application to access the modules.
+3. Users can report, track, and verify road issues.
+4. Authorities can view dashboards, analytics, and take action.
 
 ---
 
-### **Module 6: Community Verification Module**
-Allows citizens to verify issues.
+## Tech Stack (Suggested)
 
-**Features:**
-- Users confirm reported issue
-- Voting system
-- Fake complaint reduction
-
-**Purpose:**  
-Improves data accuracy.
-
----
-
-### **Module 7: Smart Route Suggestion Module**
-Suggests safer travel routes.
-
-**Features:**
-- Avoid damaged roads
-- Suggest alternate routes
-- Safety score based routing
-
-**Purpose:**  
-Helps users travel safely.
-
----
-
-### **Module 8: Before & After Repair Tracking**
-Shows improvement visually.
-
-**Features:**
-- Upload repair images
-- Compare before & after
-- Repair success tracking
-
-**Purpose:**  
-Shows repair effectiveness.
-
----
-
-## **Project Timeline**
-- **Start Date:** 02-02-26  
-- **End Date:** (To be determined)
-
----
-
-## **Tech Stack (Suggested)**
-
-**Backend:** Java, Spring Boot (or plain Java)  
-**Frontend:** HTML/CSS/JavaScript, or JavaFX  
-**Database:** MySQL / SQLite  
-**AI Module:** Python (optional) for image analysis  
-**Maps:** Google Maps API / Leaflet.js  
-
----
-
-## **Usage**
-
-1. Open the project in VS Code or your preferred Java IDE.  
-2. Run the application to access the modules.  
-3. Users can report, track, and verify road issues.  
-4. Authorities can view dashboards, analytics, and take action.  
+- **Backend:** Java (Spring Boot or Java SE)  
+- **Frontend:** HTML/CSS/JavaScript or JavaFX  
+- **Database:** SQLite / MySQL  
+- **AI/ML (optional):** Python for image analysis  
+- **Maps & Visualization:** Google Maps API / Leaflet.js
 
 ---
