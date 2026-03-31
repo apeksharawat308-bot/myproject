@@ -2,72 +2,139 @@
 <html>
 <head>
 <title>Login</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
 body {
-    margin:0;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background: linear-gradient(135deg,#00c6ff,#0072ff);
-    font-family:Arial;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
 }
 
-.card {
-    backdrop-filter: blur(20px);
-    background: rgba(255,255,255,0.2);
-    padding:30px;
-    border-radius:20px;
-    width:300px;
-    text-align:center;
+.container {
+    width: 360px;
+    padding: 40px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    text-align: center;
+    color: white;
 }
 
-input {
-    width:90%;
-    padding:10px;
-    margin:8px;
-    border:none;
-    border-radius:10px;
+.container h1 {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    background: transparent;
+    color: white;
+    outline: none;
 }
 
 button {
-    width:95%;
-    padding:10px;
-    border:none;
-    border-radius:10px;
-    background:#00b894;
-    color:white;
-    cursor:pointer;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg,#7c3aed,#9333ea);
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.footer {
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+.footer a {
+    color: #c4b5fd;
+    text-decoration: none;
 }
 </style>
 </head>
+
 <body>
 
-<div class="card">
-    <h2>Login</h2>
-    <input id="username" placeholder="Username">
-    <input id="password" type="password" placeholder="Password">
+<div class="container">
+    <h1>Login</h1>
+
+    <div class="input-group">
+        <input id="username" placeholder="Username">
+    </div>
+
+    <div class="input-group">
+        <input id="password" type="password" placeholder="Password">
+    </div>
+
     <button onclick="login()">Login</button>
+
+    <div class="footer">
+        Don't have account? <a href="signup.html">Sign Up</a>
+    </div>
 </div>
 
 <script>
 async function login(){
-    let res = await fetch("http://localhost:8080/login",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-            username:document.getElementById("username").value,
-            password:document.getElementById("password").value
-        })
-    });
 
-    let data = await res.json();
+    let uname = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
 
-    if(data.status === "success"){
-        localStorage.setItem("userId", data.userId);
-        window.location.href = "dashboard.html";
-    } else {
-        alert("Invalid Login");
+    if(!uname || !pass){
+        alert("Please enter username and password");
+        return;
+    }
+
+    try{
+        let res = await fetch("http://localhost:8080/login", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({
+                username: uname,
+                password: pass
+            })
+        });
+
+        let data = await res.json();
+
+        if(data.userId){
+            // save user
+            localStorage.setItem("userId", data.userId);
+
+            alert("Login Successful ✅");
+
+            // redirect
+            window.location.href = "dashboard.html";
+        } else {
+            alert("Invalid Username or Password ❌");
+        }
+
+    } catch(err){
+        alert("Server error ❌");
+        console.error(err);
     }
 }
 </script>

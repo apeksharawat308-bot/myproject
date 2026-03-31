@@ -2,57 +2,131 @@
 <html>
 <head>
 <title>Signup</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
 body {
-    margin:0;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background: linear-gradient(135deg,#ff9a9e,#fad0c4);
-    font-family:Arial;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
 }
 
+/* Glass Card */
 .card {
-    backdrop-filter: blur(20px);
-    background: rgba(255,255,255,0.2);
-    padding:30px;
-    border-radius:20px;
-    text-align:center;
-    width:300px;
+    width: 360px;
+    padding: 40px 30px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    text-align: center;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
-input {
-    width:90%;
-    padding:10px;
-    margin:8px;
-    border:none;
-    border-radius:10px;
+/* Title */
+.card h2 {
+    margin-bottom: 20px;
+    font-weight: 600;
 }
 
+/* Inputs */
+.input-group {
+    position: relative;
+    margin-bottom: 18px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: white;
+    outline: none;
+    font-size: 14px;
+}
+
+/* Placeholder color */
+.input-group input::placeholder {
+    color: #94a3b8;
+}
+
+/* Button */
 button {
-    width:95%;
-    padding:10px;
-    border:none;
-    border-radius:10px;
-    background:#6c5ce7;
-    color:white;
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #7c3aed, #9333ea);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
 }
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+}
+
+/* Login link */
+.footer {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.footer a {
+    color: #c4b5fd;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="card">
     <h2>Create Account</h2>
-    <input id="username" placeholder="Username">
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+
+    <div class="input-group">
+        <input id="username" placeholder="Username">
+    </div>
+
+    <div class="input-group">
+        <input id="email" placeholder="Email">
+    </div>
+
+    <div class="input-group">
+        <input id="password" type="password" placeholder="Password">
+    </div>
+
     <button onclick="signup()">Sign Up</button>
+
+    <div class="footer">
+        Already have an account? <a href="login.html">Login</a>
+    </div>
 </div>
 
 <script>
 async function signup(){
-    await fetch("http://localhost:8080/register",{
+    const res = await fetch("http://localhost:8080/register",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
@@ -61,8 +135,13 @@ async function signup(){
             password:password.value
         })
     });
-    alert("Account Created");
-    location='login.html';
+
+    if(res.ok){
+        alert("Account Created Successfully ✅");
+        location='login.html';
+    } else {
+        alert("Signup Failed ❌");
+    }
 }
 </script>
 

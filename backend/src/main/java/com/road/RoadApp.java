@@ -21,29 +21,32 @@ public class RoadApp {
     public static void main(String[] args) throws Exception {
 
         conn = DriverManager.getConnection("jdbc:sqlite:road.db");
-
         Statement st = conn.createStatement();
 
+        // USERS TABLE
         st.execute("CREATE TABLE IF NOT EXISTS users (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "username TEXT UNIQUE," +
                 "email TEXT," +
                 "password TEXT)");
 
+        // COMPLAINTS TABLE (FIXED)
         st.execute("CREATE TABLE IF NOT EXISTS complaints (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "user_id INTEGER," +
                 "description TEXT," +
                 "location TEXT," +
                 "image TEXT," +
+                "category TEXT DEFAULT 'General'," +
                 "status TEXT DEFAULT 'PENDING')");
 
         SpringApplication.run(RoadApp.class, args);
     }
 
-    // ================= SIGNUP =================
+    // ================= REGISTER =================
     @PostMapping("/register")
     public String register(@RequestBody Map<String, String> data) {
+
         try {
             PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO users(username,email,password) VALUES(?,?,?)");
@@ -53,8 +56,8 @@ public class RoadApp {
             ps.setString(3, data.get("password"));
 
             ps.executeUpdate();
-
             return "Registered Successfully";
+
         } catch (Exception e) {
             return "User already exists";
         }
@@ -77,42 +80,64 @@ public class RoadApp {
         if (rs.next()) {
             res.put("status", "success");
             res.put("userId", rs.getInt("id"));
+            res.put("message", "Login successful");
         } else {
             res.put("status", "fail");
+            res.put("message", "Invalid credentials");
         }
 
         return res;
     }
 
-    // ================= ADD COMPLAINT =================
+    // ================= ADD COMPLAINT (FIXED) =================
     @PostMapping("/addComplaint")
     public String addComplaint(
-            @RequestParam int userId,
-            @RequestParam String description,
-            @RequestParam String location,
-            @RequestParam MultipartFile image) throws Exception {
+            @RequestParam("userId") int userId,
+            @RequestParam("description") String description,
+            @RequestParam("location") String location,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "image", required = false) MultipartFile image) {
 
-        String uploadDir = System.getProperty("user.dir") + "/uploads/";
+        try {
 
-File dir = new File(uploadDir);
-if (!dir.exists()) dir.mkdirs();
+            // SAFE CATEGORY
+            String safeCategory = (category == null || category.trim().isEmpty())
+                    ? "General"
+                    : category.trim();
 
-String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-String path = uploadDir + fileName;
+            String path = "";
 
-image.transferTo(new File(path));
+            // IMAGE UPLOAD SAFE
+            if (image != null && !image.isEmpty()) {
 
-        PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO complaints(user_id,description,location,image) VALUES(?,?,?,?)");
+                String uploadDir = System.getProperty("user.dir") + "/uploads/";
 
-        ps.setInt(1, userId);
-        ps.setString(2, description);
-        ps.setString(3, location);
-        ps.setString(4, path);
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
 
-        ps.executeUpdate();
+                String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+                path = uploadDir + fileName;
 
-        return "Complaint Added";
+                image.transferTo(new File(path));
+            }
+
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO complaints(user_id,description,location,image,category) VALUES(?,?,?,?,?)");
+
+            ps.setInt(1, userId);
+            ps.setString(2, description);
+            ps.setString(3, location);
+            ps.setString(4, path);
+            ps.setString(5, safeCategory);
+
+            ps.executeUpdate();
+
+            return "SUCCESS";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        }
     }
 
     // ================= VIEW COMPLAINTS =================
@@ -125,15 +150,21 @@ image.transferTo(new File(path));
         ResultSet rs = st.executeQuery("SELECT * FROM complaints");
 
         while (rs.next()) {
+
             Map<String, Object> m = new HashMap<>();
 
             String fullPath = rs.getString("image");
-            String fileName = fullPath.substring(fullPath.lastIndexOf("/") + 1);
+            String fileName = "";
+
+            if (fullPath != null && fullPath.contains("/")) {
+                fileName = fullPath.substring(fullPath.lastIndexOf("/") + 1);
+            }
 
             m.put("id", rs.getInt("id"));
             m.put("description", rs.getString("description"));
             m.put("location", rs.getString("location"));
             m.put("status", rs.getString("status"));
+            m.put("category", rs.getString("category"));
             m.put("image", fileName);
 
             list.add(m);
@@ -142,17 +173,17 @@ image.transferTo(new File(path));
         return list;
     }
 
-    // ================= IMAGE VIEW =================
+    // ================= IMAGE API =================
     @GetMapping("/uploads/{name}")
-public ResponseEntity<byte[]> getImage(@PathVariable String name) throws Exception {
+    public ResponseEntity<byte[]> getImage(@PathVariable String name) throws Exception {
 
-    Path path = Paths.get(System.getProperty("user.dir") + "/uploads/" + name);
+        Path path = Paths.get(System.getProperty("user.dir") + "/uploads/" + name);
 
-    byte[] image = Files.readAllBytes(path);
+        byte[] image = Files.readAllBytes(path);
 
-    return ResponseEntity
-            .ok()
-            .header("Content-Type", Files.probeContentType(path)) // auto detect type
-            .body(image);
-}
+        return ResponseEntity
+                .ok()
+                .header("Content-Type", Files.probeContentType(path))
+                .body(image);
     }
+}

@@ -6,62 +6,133 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
-body {
+* {
     margin:0;
-    font-family:Arial;
-    background: linear-gradient(135deg,#1e3c72,#2a5298);
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
     color:white;
 }
 
+/* HEADER */
 header {
-    padding:15px;
+    padding:15px 30px;
     display:flex;
     justify-content:space-between;
+    align-items:center;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
+header h2 {
+    font-weight:500;
+}
+
+.logout-btn {
+    padding:8px 16px;
+    border:none;
+    border-radius:8px;
+    background: linear-gradient(90deg,#ef4444,#dc2626);
+    color:white;
+    cursor:pointer;
+}
+
+/* MAIN CONTAINER */
 .container {
-    padding:20px;
+    padding:25px;
 }
 
+/* GLASS CARDS */
 .glass {
-    backdrop-filter: blur(20px);
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(18px);
     padding:20px;
     border-radius:15px;
-    margin:15px 0;
+    margin-bottom:20px;
+    border:1px solid rgba(255,255,255,0.08);
 }
 
-input, button {
-    padding:10px;
-    margin:5px;
+/* FORM */
+input, select {
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-bottom:1px solid rgba(255,255,255,0.2);
+    background:transparent;
+    color:white;
+    outline:none;
+}
+
+/* BUTTON */
+button {
+    margin-top:15px;
+    padding:12px;
     border:none;
     border-radius:10px;
-}
-
-button {
-    background:#00cec9;
+    background: linear-gradient(90deg,#7c3aed,#9333ea);
     color:white;
+    cursor:pointer;
+    transition:0.3s;
 }
 
+button:hover {
+    transform: translateY(-2px);
+}
+
+/* GRID */
 .grid {
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:10px;
+    gap:15px;
 }
 
+/* CARD */
 .card {
-    backdrop-filter: blur(20px);
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
     padding:15px;
-    border-radius:10px;
+    border-radius:12px;
+    transition:0.3s;
 }
 
-/* MAP STYLE */
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* TAGS */
+.tag {
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:12px;
+    margin-top:5px;
+}
+
+.pothole { background:#ef4444; }
+.manhole { background:#3b82f6; }
+.water { background:#10b981; color:black; }
+.crack { background:#f59e0b; color:black; }
+.light { background:#8b5cf6; }
+
+/* MAP */
 #map {
     height:400px;
-    border-radius:15px;
+    border-radius:12px;
     margin-top:15px;
+}
+
+/* SMALL TEXT */
+h3 {
+    font-weight:500;
+    margin-bottom:10px;
 }
 </style>
 </head>
@@ -69,25 +140,37 @@ button {
 <body>
 
 <header>
-    <h2>🚧 Dashboard</h2>
-    <button onclick="logout()">Logout</button>
+    <h2>🚧 Smart Road Dashboard</h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
 </header>
 
 <div class="container">
 
+<!-- ADD COMPLAINT -->
 <div class="glass">
     <h3>Add Complaint</h3>
     <input id="desc" placeholder="Description">
     <input id="loc" placeholder="Location">
+
+    <select id="category">
+        <option value="Pothole">Pothole</option>
+        <option value="Manhole">Manhole</option>
+        <option value="Waterlogging">Waterlogging</option>
+        <option value="Crack">Road Crack</option>
+        <option value="Streetlight">Street Light Issue</option>
+    </select>
+
     <input type="file" id="img">
-    <button onclick="add()">Submit</button>
+    <button onclick="add()">Submit Complaint</button>
 </div>
 
+<!-- MAP -->
 <div class="glass">
     <h3>Map View</h3>
     <div id="map"></div>
 </div>
 
+<!-- LIST -->
 <div class="glass">
     <h3>Complaints</h3>
     <button onclick="loadComplaints()">Refresh</button>
@@ -103,23 +186,15 @@ let markersGroup;
 function initMap(){
     map = L.map('map').setView([30.3165, 78.0322], 12);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
     markersGroup = L.featureGroup().addTo(map);
 }
 
-// Helper: Get lat/lng from location string using OpenStreetMap Nominatim
 async function getLatLngFromLocation(address){
-    try {
-        let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
-        let data = await res.json();
-        if(data && data.length > 0){
-            return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-        }
-    } catch(err){
-        console.error("Geocoding error:", err);
+    let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+    let data = await res.json();
+    if(data.length > 0){
+        return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
     }
     return null;
 }
@@ -130,76 +205,76 @@ async function loadComplaints(){
 
     let box = document.getElementById("list");
     box.innerHTML = "";
-
-    // clear existing markers
     markersGroup.clearLayers();
 
     for(let c of data){
+
+        let tagClass = "pothole";
+        if(c.category === "Manhole") tagClass = "manhole";
+        if(c.category === "Waterlogging") tagClass = "water";
+        if(c.category === "Crack") tagClass = "crack";
+        if(c.category === "Streetlight") tagClass = "light";
+
         box.innerHTML += `
         <div class="card">
             <h3>${c.description}</h3>
+            <span class="tag ${tagClass}">${c.category}</span>
             <p>📍 ${c.location}</p>
             <p>Status: ${c.status}</p>
-            ${c.image ? `<img src="http://localhost:8080/uploads/${c.image}" width="200">` : ''}
+            ${c.image ? `<img src="http://localhost:8080/uploads/${c.image}" style="width:100%;margin-top:10px;border-radius:10px;">` : ''}
         </div>
         `;
 
-        let coords = null;
-
-        // Use backend lat/lng if available
-        if(c.lat && c.lng){
-            coords = [c.lat, c.lng];
-        } else if(c.location){
-            // Otherwise, geocode the location string
-            coords = await getLatLngFromLocation(c.location);
-        }
-
+        let coords = await getLatLngFromLocation(c.location);
         if(coords){
             let marker = L.marker(coords);
-            marker.bindPopup(`<b>${c.description}</b><br>📍 ${c.location}`);
+            marker.bindPopup(`<b>${c.category}</b><br>${c.description}`);
             markersGroup.addLayer(marker);
         }
     }
 
-    // Fit map to markers
     if(markersGroup.getLayers().length > 0){
         map.fitBounds(markersGroup.getBounds().pad(0.2));
     }
 }
 
 async function add(){
-    if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser");
+    let userId = localStorage.getItem("userId");
+
+    if(!userId){
+        alert("User not logged in");
         return;
     }
 
-    navigator.geolocation.getCurrentPosition(async (position) => {
-        let formData = new FormData();
-        formData.append("userId", localStorage.getItem("userId"));
-        formData.append("description", document.getElementById("desc").value);
-        formData.append("location", document.getElementById("loc").value);
-        formData.append("image", document.getElementById("img").files[0]);
-        formData.append("lat", position.coords.latitude);
-        formData.append("lng", position.coords.longitude);
+    let formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("description", desc.value);
+    formData.append("location", loc.value);
+    formData.append("category", category.value);
 
-        let res = await fetch("http://localhost:8080/addComplaint", {
-            method: "POST",
-            body: formData
-        });
+    if(img.files.length > 0){
+        formData.append("image", img.files[0]);
+    }
 
-        alert(await res.text());
-        loadComplaints();
-    }, (err) => {
-        alert("Unable to get your location. Please allow location access.");
+    let res = await fetch("http://localhost:8080/addComplaint", {
+        method:"POST",
+        body:formData
     });
+
+    alert(await res.text());
+
+    desc.value = "";
+    loc.value = "";
+    img.value = "";
+
+    loadComplaints();
 }
 
 function logout(){
     localStorage.clear();
-    window.location.href = "index.html";
+    location = "index.html";
 }
 
-// Initialize map & load complaints on page load
 window.onload = () => {
     initMap();
     loadComplaints();
